@@ -28,6 +28,7 @@ import {
 import { Image, Upload, X } from "lucide-react";
 import { addNewProperty, getCurrentUser, getUniqueStates } from "@/utils/data";
 import { useToast } from "@/hooks/use-toast";
+import { cn } from "@/lib/utils";
 
 const AddProperty = () => {
   const [title, setTitle] = useState("");
@@ -42,6 +43,7 @@ const AddProperty = () => {
   const [terms, setTerms] = useState("");
   const [imageUrls, setImageUrls] = useState<string[]>([]);
 
+  const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const [error, setError] = useState("");
     const [isLoading, setIsLoading] = useState(false);
   const [states, setStates] = useState<string[]>([]);
@@ -80,6 +82,7 @@ const AddProperty = () => {
       newFiles.forEach((file) => {
           if (file.type.startsWith("image/")) validFiles.push(file);
           else invalidFiles.push(file);
+          setUploadedFiles(validFiles);
       });
     
     if (invalidFiles.length > 0) { 
@@ -107,7 +110,6 @@ const AddProperty = () => {
     setImageUrls((prev) => {
       const updatedImageUrls = [...prev];
       updatedImageUrls.splice(index, 1);
-
 
       return updatedImageUrls;
     });
@@ -353,27 +355,31 @@ const AddProperty = () => {
                 <div className="space-y-2">
                   <Label>Property Images</Label>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <input
-                      type="file"
-                      accept="image/*"
-                      multiple
-                      onChange={handleFileUpload}
-                      className="hidden"
-                      id="image-upload"
-                    />
-                    <label
-                      htmlFor="image-upload"
-                      className="cursor-pointer w-full"
-                    >
-                      <Button 
-                        variant="outline" 
-                        className="w-full h-32 flex flex-col items-center justify-center gap-2"
-                        type="button"
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={handleFileUpload}
+                    className="hidden"
+                    id="image-upload"
+                    name="image-upload"
+                  />
+                  <label
+                    htmlFor="image-upload"
+                    className={cn(
+                      "cursor-pointer w-full",
+                      imageUrls.length > 4 && "pointer-events-none opacity-50"
+
+                    )}
+                    
+                  > 
+                    <div
+                        className="w-full h-32 flex flex-col items-center justify-center gap-2 rounded-md border-2 border-dashed hover:bg-accent hover:text-accent-foreground"
                       >
                         <Upload className="h-8 w-8 text-gray-400" />
                         <span className="text-sm text-gray-500">Upload from Device</span>
-                      </Button>
-                    </label>
+                      </div>
+                 </label>
                     {imageUrls.length > 0 && (
                       <div className="col-span-2 space-y-2">                      
                         <p className="text-sm text-gray-500">
@@ -411,7 +417,7 @@ const AddProperty = () => {
                     Cancel
                   </Button>
                   <Button 
-                    type="submit" 
+                    type="submit"
                     disabled={isLoading}
                   >
                     {isLoading ? "Adding Property..." : "Add Property"}
