@@ -113,6 +113,7 @@ const AddProperty = () => {
     });
     setUploadedFiles((prev) => {
         return prev.filter((_, i) => i !== index);
+        // this is a comment
     });
   };
 
